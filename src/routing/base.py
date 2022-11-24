@@ -10,7 +10,7 @@ def gen_graph():
     读取topo文件，生成对应的图结构
     :return: G 图结构
     '''
-    edge_list = plain_read("../../conf/topo")
+    edge_list = plain_read("../../data/topo")
     # print(edge_list)
 
     G = nx.Graph()

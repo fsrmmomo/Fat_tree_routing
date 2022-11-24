@@ -28,7 +28,7 @@ def gen_topo():
 
     for e in edge_list:
         print(e)
-    plain_write("../../conf/topo",edge_list)
+    plain_write("../../data/topo",edge_list)
 
 
 if __name__ == '__main__':
