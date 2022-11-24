@@ -29,7 +29,7 @@ def shortest_path_routing():
                 for node in path:
                     tmp += node + " "
                 tmp += subnet_mapping[path[0]] + " "
-                tmp += subnet_mapping[path[-1]] + " "
+                tmp += subnet_mapping[path[-1]]
                 save_res.append(tmp)
 
     plain_write("../../result/sp_result",save_res)
