@@ -8,15 +8,17 @@ def shortest_path_routing():
     print(asp_dict)
 
     subnet_mapping = dict()
-    for i in range(8):
+    for i in range(1,9):
         key = "access" + str(i)
         value = str(i) + ".0.0.0/8"
         subnet_mapping[key] = value
 
+    for k,v in asp_dict.items():
+        pass
 
     save_res = []
-    for i in range(8):
-        for j in range(8):
+    for i in range(1,9):
+        for j in range(1,9):
             if i!=j:
                 start = "access" + str(i)
                 end = "access" + str(j)

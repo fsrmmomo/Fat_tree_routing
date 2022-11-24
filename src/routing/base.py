@@ -42,24 +42,31 @@ def get_all_shortest_k_paths(G):
 
     # sp = nx.shortest_simple_paths(G, "access0", "access7", "delay")
     asp_dict = dict()
-    for i in range(8):
+    for i in range(1,9):
         tmp = dict()
         start = "access" + str(i)
 
-        for j in range(8):
+        for j in range(1,9):
             if i!=j:
                 end = "access" + str(j)
                 sps = []
-                if i//2 == j//2:
+                if (i-1)//2 == (j-1)//2:
                     sps = list(islice((nx.shortest_simple_paths(G, start, end, "delay")), 2))
                 else:
                     sps = list(islice((nx.shortest_simple_paths(G, start, end, "delay")), 4))
+                sps.sort()
                 tmp[end] = sps
 
         asp_dict[start] = tmp
     # print(asp_dict)
-    # for d in asp_dict.items():
-    #     print(d)
+    # for k,v in asp_dict.items():
+    #
+    #     print(v)
+    #     for t,vv in v.items():
+    #         print(t)
+    #         for pp in vv:
+    #             print(pp)
+    return asp_dict
 if __name__ == '__main__':
     G = gen_graph()
     get_all_shortest_k_paths(G)
