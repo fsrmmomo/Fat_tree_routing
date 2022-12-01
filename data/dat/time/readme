@@ -1,0 +1,18 @@
+该dat不携带时间信息
+32字节为一组
+读取方式为
+trace_byte_size = 32
+with open(rf, 'rb') as f:
+    bin_trace = f.read(trace_byte_size)
+
+    while bin_trace:
+        hex_trace = struct.unpack("BBBBHBBBBHBId", bin_trace)
+        print(hex_trace)
+        print(hex_trace[-2])
+        bin_trace = f.read(trace_byte_size)
+
+
+15字节对应关系为
+"BBBBHBBBBHBId", int(src_ip[0]), int(src_ip[1]), int(src_ip[2]),
+                int(src_ip[3]), int(self.src_port),int(dst_ip[0]), int(dst_ip[1]),
+                int(dst_ip[2]), int(dst_ip[3]), int(self.dst_port), int(self.proto)，int(self.length), double(self.time),
