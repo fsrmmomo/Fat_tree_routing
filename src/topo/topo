@@ -1,0 +1,168 @@
+#!/usr/bin/bash
+# 指定控制器地址
+controller="tcp:172.17.0.2:6653"
+# 指定路由文件
+path_file="../../result/ecmp_result"
+# ovs-dpdk 镜像
+ovs_image="ovsdpdk:latest"
+onos_image="onos-timeout:2.5.9"
+
+# 创建容器
+create_docker() {
+    for i in {1..4}; do
+        docker create -it --name=core${i} --privileged -v /dev/hugepages:/dev/hugepages -v /root/run:/root/run ${ovs_image}
+    done
+
+    for i in {1..8}; do
+        docker create -it --name=merge${i} --privileged -v /dev/hugepages:/dev/hugepages -v /root/run:/root/run ${ovs_image}
+        docker create -it --name=access${i} --privileged -v /dev/hugepages:/dev/hugepages -v /root/run:/root/run ${ovs_image}
+    done
+}
+
+# 启动容器
+start_docker() {
+    docker start core{1..4}
+    docker start merge{1..8}
+    docker start access{1..8}
+}
+
+# 停止并删除容器
+stop_rm_docker() {
+    docker stop core{1..4} && docker rm core{1..4}
+    docker stop merge{1..8} && docker rm merge{1..8}
+    docker stop access{1..8} && docker rm access{1..8}
+}
+
+# 创建core-merge之间的链路 veth-peer，并将端口添加到ovs上
+create_veth_coer_merge() {
+    for i in {1..2}; do         # core
+        for j in {1..7..2}; do  # merge
+            ip link add c${i}_m${j} type veth peer name m${j}_c${i};
+            ip link set dev c${i}_m${j} name c${i}_m${j} netns $(sudo docker inspect -f '{{.State.Pid}}' core${i}) up
+            ip link set dev m${j}_c${i} name m${j}_c${i} netns $(sudo docker inspect -f '{{.State.Pid}}' merge${j}) up
+            docker exec merge${j} bash -c "ovs-vsctl add-port br0 m${j}_c${i}"
+            docker exec core${i} bash -c "ovs-vsctl add-port br0 c${i}_m${j}"
+        done
+    done
+
+    for i in {3..4}; do         # core
+        for j in {2..8..2}; do  # merge
+            ip link add c${i}_m${j} type veth peer name m${j}_c${i};
+            ip link set dev c${i}_m${j} name c${i}_m${j} netns $(sudo docker inspect -f '{{.State.Pid}}' core${i}) up
+            ip link set dev m${j}_c${i} name m${j}_c${i} netns $(sudo docker inspect -f '{{.State.Pid}}' merge${j}) up
+            docker exec merge${j} bash -c "ovs-vsctl add-port br0 m${j}_c${i}"
+            docker exec core${i} bash -c "ovs-vsctl add-port br0 c${i}_m${j}"
+        done
+    done
+}
+
+# 创建merge-access之间的链路 veth-peer，并将端口添加到ovs上
+create_veth_merge_access() {
+    for i in {1..8}; do
+        ip link add m${i}_a${i} type veth peer name a${i}_m${i};
+        ip link set dev m${i}_a${i} name m${i}_a${i} netns $(sudo docker inspect -f '{{.State.Pid}}' merge${i}) up
+        ip link set dev a${i}_m${i} name a${i}_m${i} netns $(sudo docker inspect -f '{{.State.Pid}}' access${i}) up
+
+        docker exec merge${i} bash -c "ovs-vsctl add-port br0 m${i}_a${i}"
+        docker exec access${i} bash -c "ovs-vsctl add-port br0 a${i}_m${i}"
+
+        if [ $((${i}%2)) == 0 ]
+        then
+            j=$((${i}-1))
+        else
+            j=$((${i}+1))
+        fi
+
+        ip link add m${i}_a${j} type veth peer name a${j}_m${i};
+        ip link set dev m${i}_a${j} name m${i}_a${j} netns $(sudo docker inspect -f '{{.State.Pid}}' merge${i}) up
+        ip link set dev a${j}_m${i} name a${j}_m${i} netns $(sudo docker inspect -f '{{.State.Pid}}' access${j}) up
+        docker exec merge${i} bash -c "ovs-vsctl add-port br0 m${i}_a${j}"
+        docker exec access${j} bash -c "ovs-vsctl add-port br0 a${j}_m${i}"
+    done
+}
+
+# 启动OVS-DPDK的函数，传入参数 $1: 容器名 $2: datapath_id
+ovs_init() {
+    docker exec ${1} bash -c "/usr/local/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd start --system-id=10001"
+    docker exec ${1} bash -c "ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask=0x02"
+    docker exec ${1} bash -c "ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem=\"512\""
+    docker exec ${1} bash -c "ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-init=true"
+    docker exec ${1} bash -c "/usr/local/share/openvswitch/scripts/ovs-ctl --no-ovsdb-server --db-sock=\"${DB_SOCK}\" start"
+    docker exec ${1} bash -c "ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev"
+    docker exec ${1} bash -c "ovs-vsctl set bridge br0 other_config:datapath-id=0x000000000000${2}"
+
+    # 不连接控制器注释下面两句
+    # docker exec ${1} bash -c "ovs-vsctl set bridge br0 protocols=OpenFlow10,OpenFlow13"
+    # docker exec ${1} bash -c "ovs-vsctl set-controller br0 ${controller}"
+}
+
+# 启动各个容器上的 OVS
+start_ovs() {
+    # $1: 容器名 $2: datapath_id
+    for i in {1..4}; do
+        ovs_init core${i} 001${i}
+    done
+
+    for i in {1..8}; do
+        ovs_init merge${i} 002${i}
+    done
+
+    for i in {1..8}; do
+        ovs_init access${i} 003${i}
+    done
+}
+
+# 停止 OVS
+stop_ovs() {
+    for i in {1..4}; do
+        docker exec core${i} bash -c "/usr/local/share/openvswitch/scripts/ovs-ctl stop"
+    done
+
+    for container in {merge,access}{1..8}; do
+        docker exec ${container} bash -c "/usr/local/share/openvswitch/scripts/ovs-ctl stop"
+    done
+}
+
+# 重启 ONOS
+restart_onos() {
+    docker stop onos-fat
+    docker rm onos-fat
+
+    docker run -t -d -p 18181:8181 -p 16653:6653 --name onos-fat ${onos_image}
+    sleep 20
+    docker inspect --format '{{ .NetworkSettings.IPAddress }}' onos-fat
+
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.openflow-base
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.ofagent
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.fwd
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.drivers.ovsdb
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.proxyarp
+    docker exec onos-fat /root/onos/bin/onos-app localhost activate org.onosproject.lldpprovider
+}
+
+# 创建拓扑
+create_topo() {
+    create_docker
+    start_docker
+    start_ovs
+    create_veth_coer_merge
+    create_veth_merge_access
+}
+
+# 删除拓扑
+destroy_topo() {
+    stop_rm_docker
+}
+
+# 根据路由文件添加流表
+add_flow() {
+    python3 ./add_flow.py ${path_file}
+}
+
+if [ -n "$1" ]
+then
+    echo "execute ${1}"
+    eval ${1}
+else
+    echo "需要选择执行的命令: create_topo / destroy_topo / add_flow"
+fi
