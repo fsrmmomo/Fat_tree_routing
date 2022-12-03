@@ -44,7 +44,7 @@ def ecmp_path_routing():
                         tmp += str(i) + "." + str(k*64) + ".0.0/10"+" "
                         tmp += subnet_mapping[path[-1]]
                         save_res.append(tmp)
-    plain_write("../../result/ecmp_result",save_res)
+    plain_write("../../result/routing/ecmp_result", save_res)
 
 
 if __name__ == '__main__':

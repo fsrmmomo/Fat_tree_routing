@@ -11,7 +11,7 @@ def read_ecmp_routing_and_get_mapping():
     """
 
     routing = []
-    with open("../../result/ecmp_result", 'r') as f:
+    with open("../../result/routing/ecmp_result", 'r') as f:
         for line in f.readlines():
             tmp = line.split()
             if len(tmp) == 5:
@@ -42,6 +42,8 @@ def read_ecmp_routing_and_get_mapping():
         subflow_to_switch_match_dict[i] = []
         for sw in p:
             subflow_to_switch_match_dict[i].append(sw)
+    print(subflow_to_switch_match_dict)
+    print(switch_to_subflow_match_dict)
     return subflow_to_switch_match_dict
 
 
@@ -111,8 +113,10 @@ def gen_sub_dat_with_flag():
     for i in range(1, 5):
         node_list.append("core" + str(i))
 
-    read_file_dir = "../../data/dat/flag_dat/20s/"
-    write_file_dir = "../../data/dat/flag_dat/slice/"
+    # read_file_dir = "../../data/dat/flag_dat/20s/"
+    # write_file_dir = "../../data/dat/flag_dat/slice/"
+    read_file_dir = "../../data/dat/nodelay/20s/"
+    write_file_dir = "../../data/dat/nodelay/slice/"
     trace_byte_size = 16
     x = 0
     sw_bin_list = dict()

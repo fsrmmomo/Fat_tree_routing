@@ -1,6 +1,10 @@
 from util.utils import *
 
 def gen_topo():
+    """
+    生成topo文件的代码
+    :return:
+    """
     edge_list = []
 
     for i in range(8):

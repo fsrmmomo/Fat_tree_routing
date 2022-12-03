@@ -32,7 +32,7 @@ def shortest_path_routing():
                 tmp += subnet_mapping[path[-1]]
                 save_res.append(tmp)
 
-    plain_write("../../result/sp_result",save_res)
+    plain_write("../../result/routing/sp_result", save_res)
 
 if __name__ == '__main__':
     shortest_path_routing()

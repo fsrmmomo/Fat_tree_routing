@@ -12,11 +12,12 @@ def time_dat_to_flag_dat():
 
     # 0.5 一组进行切割，然后统计特征，进行识别
     read_file_dir = "../../data/dat/time/20s/"
-    write_file_dir = "../../data/dat/flag_dat/20s/"
+    # write_file_dir = "../../data/dat/flag_dat/20s/"
+    write_file_dir = "../../data/dat/nodelay/20s/"
     big_key_dir = "../../data/dat/time/result/"
     trace_byte_size = 32
 
-    delay = 0.2
+    delay = 0.0
     for i in range(10):
         print(i)
         T = 0.5
@@ -30,7 +31,9 @@ def time_dat_to_flag_dat():
             all_big_keys = pkl.load(f)
 
         big_key_index = 0
-        big_keys = all_big_keys[big_key_index]
+        # big_keys = all_big_keys[big_key_index]
+        big_keys = dict()
+        print(len(big_keys))
         new_bin_list = []
         with open(read_file, 'rb') as rf:
             bin_trace = rf.read(trace_byte_size)
@@ -54,13 +57,15 @@ def time_dat_to_flag_dat():
                 # print(len(new_bin))
                 if hex_trace[-1]>t+delay:
                     t = t+T
-                    big_key_index += 1
+
                     if big_key_index==40:
                         break
                     big_keys.update(all_big_keys[big_key_index])
 
-                bin_trace = rf.read(trace_byte_size)
+                    big_key_index += 1
 
+                bin_trace = rf.read(trace_byte_size)
+        print(len(big_keys))
         write_file = write_file_dir + str(i) + ".dat"
         with open(write_file, "wb") as wf:
             for bin in new_bin_list:
