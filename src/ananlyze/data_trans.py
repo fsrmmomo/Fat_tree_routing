@@ -16,7 +16,7 @@ def get_node_list():
     return node_list
 
 def read_raw():
-    read_file_dir = "../../result/div/"
+    read_file_dir = "../../result/DivSketch/"
 
     node_list = get_node_list()
 
@@ -65,7 +65,7 @@ def aggregation_data():
             for j in range(data_point_num):
                 new_dict[key][j] += s_dict[node][j]/down
         data_dict[k] = new_dict
-    with open("../../result/data_dict/aggregation.pkl","wb") as wf:
+    with open("../../result/data_dict/DivSketch.pkl","wb") as wf:
         pkl.dump(data_dict,wf)
     print(data_dict["ARE"])
     print(data_dict["HHD_ARE"])
