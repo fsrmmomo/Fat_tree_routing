@@ -30,6 +30,8 @@ def draw_line(x: list, y_list: list, label_list: list, color_list: list,
               figsize: tuple, title: str,
               save_name: str, no: int,
               sci=False,log=False):
+    print(len(x))
+    print(len(xticks_label))
     assert len(x) == len(xticks_label)
     assert len(y_list) == len(label_list)
     assert len(y_list)<=len(marker_list)
@@ -100,7 +102,8 @@ def plot_linear(task, ylimit: list, title_patter: str,sci=False,log=False ):
         y_list = []
 
         for algo in cmp_list:
-            y_list.append(data_dict[algo][task][node])
+
+            y_list.append(data_dict[algo][task][node][:data_point_num])
         # title = "Heavy Hitter Detection on " + node.capitalize() + " Node"
         title = title_patter + " on " + node.capitalize() + " Node"
         save_name = task + "_" + node
@@ -122,10 +125,15 @@ if __name__ == '__main__':
     for algo in algo_set:
         global data_dict
         data_dict[algo] = pkl_read(data_dict_dir + algo + ".pkl")
+    data_dict.update(pkl_read("../../result/data_dict/output.pkl"))
+
+    for k,v in data_dict.items():
+        print(k)
+        print(v)
         # print(data_dict[algo])
     # print(data_dict)
-    plot_linear("ARE", ylimit=[0, 1], title_patter="Flow Size Measurement")
-    # plot_linear("HHD_ARE", ylimit=[0, 0.05], title_patter="Heavy Hitter Detection")
+    # plot_linear("ARE", ylimit=[0, 2], title_patter="Flow Size Measurement")
+    # plot_linear("HHD_ARE", ylimit=[0, 0.03], title_patter="Heavy Hitter Detection")
     # plot_linear("HHD_F1", ylimit=[0.9, 1], title_patter="Heavy Hitter Detection")
-    # plot_linear("CE", ylimit=[0,0.01], title_patter="Cardinality Estimation",sci=True)
-    # plot_linear("WMRE", ylimit=[0,2], title_patter="Flow Size Distribution Estimation",log=True)
+    # plot_linear("CE", ylimit=[0,0.05], title_patter="Cardinality Estimation",sci=False)
+    plot_linear("WMRE", ylimit=[0,2], title_patter="Flow Size Distribution Estimation",log=True)

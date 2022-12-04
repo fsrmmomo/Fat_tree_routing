@@ -1,5 +1,6 @@
 import os
 import pickle as pkl
+from util.utils import *
 file_num = 200
 dat_num = 10
 data_point_num = 10  # 容量级别 2，3,4,5,6，8,9,10,11
@@ -14,6 +15,11 @@ def get_node_list():
     for i in range(1, 5):
         node_list.append("core" + str(i))
     return node_list
+
+def read_txt():
+    data_dict = pkl_read("../../result/data_dict/output.pkl")
+    print(data_dict)
+
 
 def read_raw():
     read_file_dir = "../../result/DivSketch/"
@@ -74,4 +80,5 @@ def aggregation_data():
 
 if __name__ == '__main__':
     # read_raw()
-    aggregation_data()
+    # aggregation_data()
+    read_txt()
