@@ -8,7 +8,7 @@ def read_dat():
     :return:
     """
     # rf = '../../data/dat/notime/slice/1-access1.dat'
-    rf = '../../data/dat/flag_dat/slice/1-access1.dat'
+    rf = '../../data/dat/flag_dat/slice/5-access1.dat'
 
     x = 0
     src_set = dict()
@@ -61,4 +61,4 @@ def read_dat2():
 
 if __name__ == '__main__':
     read_dat()
-    read_dat2()
+    # read_dat2()

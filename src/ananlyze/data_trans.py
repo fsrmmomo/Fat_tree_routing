@@ -1,12 +1,19 @@
 import os
 import pickle as pkl
+import struct
+
+from numpy.ma import mean
+
 from util.utils import *
+
 file_num = 200
 dat_num = 10
 data_point_num = 10  # 容量级别 2，3,4,5,6，8,9,10,11
 access_node = 8
 merge_node = 8
 core_node = 4
+
+
 def get_node_list():
     node_list = []
     for i in range(1, 9):
@@ -15,10 +22,6 @@ def get_node_list():
     for i in range(1, 5):
         node_list.append("core" + str(i))
     return node_list
-
-def read_txt():
-    data_dict = pkl_read("../../result/data_dict/output.pkl")
-    print(data_dict)
 
 
 def read_raw():
@@ -45,18 +48,19 @@ def read_raw():
                     s_dict[node][j] += nums / dat_num
         print(s_dict["access1"])
         print(s_dict)
-    with open("../../result/data_dict/all.pkl","wb") as wf:
-        pkl.dump(data_dict,wf)
+    with open("../../result/data_dict/all.pkl", "wb") as wf:
+        pkl.dump(data_dict, wf)
+
 
 def aggregation_data():
     """
     把每一层的数据合并算平均值
     :return:
     """
-    with open("../../result/data_dict/all.pkl","rb") as rf:
+    with open("../../result/data_dict/all.pkl", "rb") as rf:
         data_dict = pkl.load(rf)
     node_list = get_node_list()
-    for k,s_dict in data_dict.items():
+    for k, s_dict in data_dict.items():
         new_dict = dict()
         new_dict["access"] = [0 for _ in range(data_point_num)]
         new_dict["merge"] = [0 for _ in range(data_point_num)]
@@ -69,16 +73,115 @@ def aggregation_data():
             else:
                 down = 8
             for j in range(data_point_num):
-                new_dict[key][j] += s_dict[node][j]/down
+                new_dict[key][j] += s_dict[node][j] / down
         data_dict[k] = new_dict
-    with open("../../result/data_dict/DivSketch.pkl","wb") as wf:
-        pkl.dump(data_dict,wf)
+    with open("../../result/data_dict/DivSketch.pkl", "wb") as wf:
+        pkl.dump(data_dict, wf)
     print(data_dict["ARE"])
     print(data_dict["HHD_ARE"])
     print(data_dict["HHD_F1"])
 
 
+def count_num():
+    """
+    统计每个节点流的数目和包的数目
+    :return:
+    """
+    node_list = get_node_list()
+    read_dir = "../../data/dat/flag_dat/slice/"
+
+    flow_count_per_node_dict = dict()
+    pkt_count_per_node_dict = dict()
+    for node in node_list:
+        flow_count_per_node_dict[node] = 0
+        pkt_count_per_node_dict[node] = 0
+
+    trace_byte_size = 16
+    for file in os.listdir(read_dir):
+        print(file)
+        s = file.split(".")[0]
+        # dat_id = s.split("-")[0]
+        node = s.split("-")[1]
+
+        flow_id = dict()
+        pkt_count = 0
+        with open(read_dir + file, "rb") as rf:
+            bin_trace = rf.read(trace_byte_size)
+            while bin_trace:
+                pkt_count += 1
+                src_ip = int.from_bytes(bin_trace[2:6], 'big')
+                flow_id[src_ip] = 0
+                bin_trace = rf.read(trace_byte_size)
+
+        flow_count_per_node_dict[node] += int(len(flow_id) / dat_num)
+        pkt_count_per_node_dict[node] += int(pkt_count / dat_num)
+        # print(node)
+        # print(pkt_count)
+    print(flow_count_per_node_dict)
+    print(pkt_count_per_node_dict)
+    pkl_write("../../result/data_dict/flow_count_per_node_dict.pkl", flow_count_per_node_dict)
+    pkl_write("../../result/data_dict/pkt_count_per_node_dict", pkt_count_per_node_dict)
+
+    # print(dat_id)
+    # print(node)
+
+
+def get_CDF():
+    """
+    统计十个dat数据的CDF曲线，最后计算一个平均值
+    :return:
+    """
+    read_dir = "../../data/dat/flag_dat/20s/"
+    files = os.listdir(read_dir)
+    cdf_data_list = []
+    for file in files:
+        print(file)
+        x = 0
+        src_set = dict()
+        trace_byte_size = 16
+        with open(read_dir + file, 'rb') as f:
+            bin_trace = f.read(trace_byte_size)
+
+            while bin_trace:
+                x += 1
+                src_ip = int.from_bytes(bin_trace[2:6], 'big')
+                if src_ip in src_set.keys():
+                    src_set[src_ip] += 1
+                else:
+                    src_set[src_ip] = 1
+                bin_trace = f.read(trace_byte_size)
+        flow_list = []
+        for k, v in src_set.items():
+            # flow_list.append([k, v])
+            flow_list.append(v)
+        flow_list.sort(reverse=True)
+        cdf_list = [0]
+        sum = 0
+        for i in range(len(flow_list)):
+            sum += flow_list[i]
+            cdf_list.append(sum / x)
+
+        indexs = [int(i / 100 * len(flow_list)) for i in range(101)]
+
+        percent_cdf_list = []
+        for index in indexs:
+            percent_cdf_list.append(cdf_list[index])
+        print(percent_cdf_list)
+
+        cdf_data_list.append(percent_cdf_list)
+
+    cdf_data = []
+
+    print(len(cdf_data_list))
+    for i in range(101):
+        cdf_data.append(mean([cdf_data_list[j][i] for j in range(10)]))
+    print(cdf_data)
+    pkl_write("../../result/data_dict/cdf_data.pkl",cdf_data)
+
+
+
 if __name__ == '__main__':
     # read_raw()
     # aggregation_data()
-    read_txt()
+    # count_num()
+    get_CDF()

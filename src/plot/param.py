@@ -1,6 +1,7 @@
 algo1 = "DivSketch"
 algo2 = "ServerCount Sketch"
 data_point_num = 9
+node_nums = 20
 mem_list = [0.2 + 0.1 * i for i in range(data_point_num)]
 color_list = ['g', 'r', 'c', 'm', 'y', 'k', 'b', 'w']
 marker_list = ['o', 'D', 'x', '+', 'v', '^', '*']
