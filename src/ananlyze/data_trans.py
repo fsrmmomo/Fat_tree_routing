@@ -1,9 +1,9 @@
 import os
 import pickle as pkl
 import struct
-
+from scipy import stats
 from numpy.ma import mean
-
+import numpy as np
 from util.utils import *
 
 file_num = 200
@@ -24,10 +24,100 @@ def get_node_list():
     return node_list
 
 
-def read_raw():
-    read_file_dir = "../../result/DivSketch/"
+def error_cul():
+    #
+    # read_file_dir = "../../result/TM-SALFI/"
+    # all_dict = pkl_read("../../result/data_dict/all.pkl")
+    # for k,v in all_dict.items():
+    #     print(k)
+    #     print(v)
+    # print(all_dict)
+
+
+    read_file_dir = "../../result/TM-SALFI/"
 
     node_list = get_node_list()
+
+
+    data_dict = dict()
+
+    for file in os.listdir(read_file_dir):
+        data_dict[file] = dict()
+        s_dict = data_dict[file]
+        for file_no in range(10):
+            s_dict[file_no] = dict()
+            for node in node_list:
+                s_dict[file_no][node] = [0 for _ in range(data_point_num)]
+
+
+        read_file_name = read_file_dir + file
+        print(read_file_name)
+        x = [0 for _ in range(data_point_num)]
+        with open(read_file_name, "r") as rf:
+            for i in range(file_num):
+                start = rf.readline()
+                string = start.split("\\")[-1]
+                node = string.split("-")[-1].split(".")[0]
+                dat_file_no = int(string.split("-")[0])
+                for j in range(data_point_num):
+                    nums = float(rf.readline())
+                    s_dict[dat_file_no][node][j] = nums
+        # print(s_dict[0]["access1"])
+        # print(s_dict)
+
+
+    for k, s_dict in data_dict.items():
+        tmp_dict = dict()
+        for dat_file_no in range(dat_num):
+            tmp_dict[dat_file_no] = dict()
+            new_dict = tmp_dict[dat_file_no]
+            new_dict["access"] = [0 for _ in range(data_point_num)]
+            new_dict["merge"] = [0 for _ in range(data_point_num)]
+            new_dict["core"] = [0 for _ in range(data_point_num)]
+            # print(type(s_dict))
+            for node in node_list:
+                key = node[:-1]
+                if key == "core":
+                    down = 4
+                else:
+                    down = 8
+                for j in range(data_point_num):
+                    new_dict[key][j] += s_dict[dat_file_no][node][j] / down
+        data_dict[k] = tmp_dict
+        print(data_dict[k])
+    # with open("../../result/data_dict/all.pkl", "wb") as wf:
+    #     pkl.dump(data_dict, wf)
+
+    error_data = dict()
+    for k, s_dict in data_dict.items():
+        error_data[k] = dict()
+        new_dict = error_data[k]
+
+        node_set = ["access", "merge", "core"]
+        for node in node_set:
+            new_dict[node] = []
+            for i in range(data_point_num):
+                datas = [s_dict[j][node][i] for j in range(dat_num)]
+                new_dict[node].append(cul_up_and_down(datas,0.95))
+                # for file_no in range(dat_num):
+        print(error_data[k])
+
+    save_dict = dict()
+    save_dict["TM-SALFI"] = error_data
+    print(save_dict)
+    pkl_write("../../result/data_dict/error_1.pkl",save_dict)
+
+def cul_up_and_down(datas, Confidence=0.95):
+    x = np.array(datas)
+    return stats.t.interval(Confidence,len(datas)-1,x.mean(),x.std())
+
+
+def read_raw():
+    read_file_dir = "../../result/TM-SALFI/"
+
+    node_list = get_node_list()
+
+
 
     data_dict = dict()
     for file in os.listdir(read_file_dir):
@@ -75,7 +165,7 @@ def aggregation_data():
             for j in range(data_point_num):
                 new_dict[key][j] += s_dict[node][j] / down
         data_dict[k] = new_dict
-    with open("../../result/data_dict/DivSketch.pkl", "wb") as wf:
+    with open("../../result/data_dict/TM-SALFI.pkl", "wb") as wf:
         pkl.dump(data_dict, wf)
     print(data_dict["ARE"])
     print(data_dict["HHD_ARE"])
@@ -184,4 +274,5 @@ if __name__ == '__main__':
     # read_raw()
     # aggregation_data()
     # count_num()
-    get_CDF()
+    # get_CDF()
+    error_cul()
