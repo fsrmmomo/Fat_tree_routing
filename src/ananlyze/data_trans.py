@@ -33,11 +33,9 @@ def error_cul():
     #     print(v)
     # print(all_dict)
 
-
     read_file_dir = "../../result/TM-SALFI/"
 
     node_list = get_node_list()
-
 
     data_dict = dict()
 
@@ -48,7 +46,6 @@ def error_cul():
             s_dict[file_no] = dict()
             for node in node_list:
                 s_dict[file_no][node] = [0 for _ in range(data_point_num)]
-
 
         read_file_name = read_file_dir + file
         print(read_file_name)
@@ -64,7 +61,6 @@ def error_cul():
                     s_dict[dat_file_no][node][j] = nums
         # print(s_dict[0]["access1"])
         # print(s_dict)
-
 
     for k, s_dict in data_dict.items():
         tmp_dict = dict()
@@ -98,26 +94,25 @@ def error_cul():
             new_dict[node] = []
             for i in range(data_point_num):
                 datas = [s_dict[j][node][i] for j in range(dat_num)]
-                new_dict[node].append(cul_up_and_down(datas,0.95))
+                new_dict[node].append(cul_up_and_down(datas, 0.95))
                 # for file_no in range(dat_num):
         print(error_data[k])
 
     save_dict = dict()
     save_dict["TM-SALFI"] = error_data
     print(save_dict)
-    pkl_write("../../result/data_dict/error_1.pkl",save_dict)
+    pkl_write("../../result/data_dict/error_1.pkl", save_dict)
+
 
 def cul_up_and_down(datas, Confidence=0.95):
     x = np.array(datas)
-    return stats.t.interval(Confidence,len(datas)-1,x.mean(),x.std())
+    return stats.t.interval(Confidence, len(datas) - 1, x.mean(), x.std())
 
 
 def read_raw():
     read_file_dir = "../../result/TM-SALFI/"
 
     node_list = get_node_list()
-
-
 
     data_dict = dict()
     for file in os.listdir(read_file_dir):
@@ -266,13 +261,42 @@ def get_CDF():
     for i in range(101):
         cdf_data.append(mean([cdf_data_list[j][i] for j in range(10)]))
     print(cdf_data)
-    pkl_write("../../result/data_dict/cdf_data.pkl",cdf_data)
+    pkl_write("../../result/data_dict/cdf_data.pkl", cdf_data)
 
 
+def get_kw_cmp():
+    read_file_dir = "../../result/result2/"
+    files = os.listdir(read_file_dir)
+    data_dict = dict()
+    data_dict["2"] = []
+    data_dict["4"] = []
+    data_dict["8"] = []
+    k_list = ["2", "4", "8"]
+    ratio_list = [1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01]
+
+    for k in k_list:
+        read_file_name = read_file_dir + "ARE" + k
+        with open(read_file_name, "r") as rf:
+            tmp = [[] for _ in range(7)]
+            for i in range(10):
+                start = rf.readline()
+                for j in range(7):
+                    nums = float(rf.readline())
+                    # tmp.append(nums)
+                    tmp[j].append(nums)
+            print(tmp)
+            avr = []
+            for j in range(7):
+                avr.append(mean(tmp[j]))
+            print(avr)
+            data_dict[k] = avr
+    print(data_dict)
+    pkl_write("../../result/data_dict/kw_cmp.pkl",data_dict)
 
 if __name__ == '__main__':
     # read_raw()
     # aggregation_data()
     # count_num()
     # get_CDF()
-    error_cul()
+    # error_cul()
+    get_kw_cmp()
