@@ -144,6 +144,10 @@ def plot_linear(task, ylimit: list, title_patter: str,sci=False,log=False ):
     # task = "HHD_F1"
     cmp_list = cmp_dict[task]
     label_list = cmp_list
+    new_label_list = cmp_list[:]
+    if "CountMin Sketch" in new_label_list:
+        new_label_list.remove("CountMin Sketch")
+        new_label_list.append("CM Sketch")
     for i, node in enumerate(node_set):
         y_list = []
 
@@ -151,14 +155,19 @@ def plot_linear(task, ylimit: list, title_patter: str,sci=False,log=False ):
 
             y_list.append(data_dict[algo][task][node][:data_point_num])
         # title = "Heavy Hitter Detection on " + node.capitalize() + " Node"
-        title = title_patter + " on " + node.capitalize() + " Node"
-        save_name = task + "_" + node
-        if task == "CE":
-            ylabel = "RE"
+        node_name = node_name_map[node]
+        title = title_patter + " on " + node_name.capitalize() + " Node"
+        save_name = task + "_" + node_name
+        if task == "CE" or task == "HHD_ARE":
+            ylabel = "ARE"
+        elif task == "HHD_F1":
+            ylabel = "F1"
         else:
             ylabel = task
+
+
         draw_line(x=list(range(data_point_num)), y_list=y_list,
-                  label_list=label_list, xticks_label=xticks_label, yticks_labels=None,
+                  label_list=new_label_list, xticks_label=xticks_label, yticks_labels=None,
                   color_list=color_list, marker_list=marker_list,
                   xlimit=[0, data_point_num - 1], ylimit=ylimit,
                   xlabel="Memory Usage (MB)", ylabel=ylabel,
@@ -373,8 +382,8 @@ def plot_statistics():
     plot_linear("ARE", ylimit=[0, 2], title_patter="Flow Size Measurement")
     plot_linear("HHD_ARE", ylimit=[0, 0.03], title_patter="Heavy Hitter Detection")
     plot_linear("HHD_F1", ylimit=[0.9, 1], title_patter="Heavy Hitter Detection")
-    plot_linear("CE", ylimit=[0.00001,0.1], title_patter="Cardinality Estimation",log=True)
-    plot_linear("CE", ylimit=[0,0.1], title_patter="Cardinality Estimation",log=False)
+    # plot_linear("CE", ylimit=[0.00001,0.1], title_patter="Cardinality Estimation",log=True)
+    plot_linear("CE", ylimit=[0,0.03], title_patter="Cardinality Estimation",log=False)
     plot_linear("WMRE", ylimit=[0.0001,2], title_patter="Flow Size Distribution Estimation",log=True)
 
 def plot_flow_and_pkt_count():
@@ -383,21 +392,36 @@ def plot_flow_and_pkt_count():
 
     flow_count_list = []
     pkt_count_list = []
-    xticks_label = []
+
     node_list = get_node_list()
+    # node_name = node_name_map[node]
     for node in node_list:
         flow_count_list.append(flow_count_dict[node])
         pkt_count_list.append(pkt_count_dict[node])
+
+    #change xticks_label
+    xticks_label = []
+    for node in node_list:
+        if node[:-1] == "access":
+            xticks_label.append("Edge"+node[-1])
+        elif node[:-1] == "merge":
+            xticks_label.append("Agg" + node[-1])
+        else:
+            xticks_label.append(node)
+
+    print(xticks_label)
     print(len(xticks_label))
+    print(flow_count_dict)
+    print(pkt_count_dict)
     draw_bar_no_cmp(x=list(range(20)), y=flow_count_list,
-                    xlimit=[-1, 20], ylimit=[0,90000],xticks_label=node_list,
-                    xlabel="Node Name", ylabel="Number of Flows",
+                    xlimit=[-1, 20], ylimit=[0,90000],xticks_label=xticks_label,
+                    xlabel="Node", ylabel="Number of Flows",
                     figsize=(9, 4.5), title="Number of Flows on Each Node",
                     save_name="Flows_Number", no=1, sci=True, log=False)
 
     draw_bar_no_cmp(x=list(range(20)), y=pkt_count_list,
-                    xlimit=[-1, 20], ylimit=[0,500000],xticks_label=node_list,
-                    xlabel="Node Name", ylabel="Number of Packets",
+                    xlimit=[-1, 20], ylimit=[0,500000],xticks_label=xticks_label,
+                    xlabel="Node", ylabel="Number of Packets",
                     figsize=(9, 4.5), title="Number of Packets on Each Node",
                     save_name="Packets_Number", no=1, sci=True, log=False)
 
@@ -432,6 +456,7 @@ def get_all_data():
     pkl_write("../../result/data_dict/all_error.pkl", error_dict)
 
 if __name__ == '__main__':
+    get_all_data()
 
     # global data_dict
     # for algo in algo_set:
@@ -450,6 +475,6 @@ if __name__ == '__main__':
     # plot_linear("CE", ylimit=[0,0.1], title_patter="Cardinality Estimation",log=False)
     # plot_linear("WMRE", ylimit=[0.0001,2], title_patter="Flow Size Distribution Estimation",log=True)
 
-    # plot_flow_and_pkt_count()
-    plot_statistics()
+    plot_flow_and_pkt_count()
+    # plot_statistics()
     # plot_statistics_error_bar()

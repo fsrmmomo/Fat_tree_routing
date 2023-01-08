@@ -115,8 +115,8 @@ def gen_sub_dat_with_flag():
 
     # read_file_dir = "../../data/dat/flag_dat/20s/"
     # write_file_dir = "../../data/dat/flag_dat/slice/"
-    read_file_dir = "../../data/dat/nodelay/20s/"
-    write_file_dir = "../../data/dat/nodelay/slice/"
+    read_file_dir = "../../data/dat/nodelay/20s1/"
+    write_file_dir = "../../data/dat/nodelay/slice1/"
     trace_byte_size = 16
     x = 0
     sw_bin_list = dict()
