@@ -40,23 +40,23 @@ def plot_bar_cmp_sim1():
               figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
               save_name="4-sim-1-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
 def plot_bar_cmp_sim2():
-    data = pkl_read("../../result/cha4/ms")
+    data = pkl_read("../../result/cha4/ms2")
     for d in data:
         for i,num in enumerate(d):
             d[i] = 1-num
-    # draw_bar_no_cmp2(x=[i+1 for i in range(10)], y=data[0],
-    #                 xlimit=[-1, 11], ylimit=[0, 9E-7], xticks_label=[i+1 for i in range(10)],
-    #                 xlabel="任务数量", ylabel="1-Ratio",
-    #                 figsize=(8, 4.5), title="多任务下测量节点分配算法效果",
-    #                 save_name="4-sim-2-1", no=1, sci=True, log=False)
+    draw_bar_no_cmp2(x=[i+1 for i in range(10)], y=data[0],
+                    xlimit=[-1, 11], ylimit=[0, 2E-6], xticks_label=[i+1 for i in range(10)],
+                    xlabel="任务数量", ylabel="1-Ratio",
+                    figsize=(8, 4.5), title="多任务下测量节点分配算法效果",
+                    save_name="4-sim-2-1", no=1, sci=True, log=False)
 
     draw_bar_no_cmp2(x=[i+1 for i in range(10)], y=data[1],
-                    xlimit=[-1, 11], ylimit=[0, 9E-7], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)],
+                    xlimit=[-1, 11], ylimit=[0, 2E-6], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)],
                     xlabel="网络资源总量", ylabel="1-Ratio",
                     figsize=(8, 4.5), title="多任务下测量节点分配算法效果",
                     save_name="4-sim-2-2-a", no=1, sci=True, log=False,istitle=False)
     draw_bar_no_cmp2(x=[i+1 for i in range(10)], y=data[2],
-                    xlimit=[-1, 11], ylimit=[0, 9E-7], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)],
+                    xlimit=[-1, 11], ylimit=[0, 2E-6], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)],
                     xlabel="网络资源总量", ylabel="1-Ratio",
                     figsize=(8, 4.5), title="多任务下测量节点分配算法效果",
                     save_name="4-sim-2-2-b", no=1, sci=True, log=False,istitle=False)
@@ -124,5 +124,5 @@ def plot_bar_cmp_sim3():
     #           figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
     #           save_name="4-sim-3-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
 if __name__ == '__main__':
-    # plot_bar_cmp_sim2()
-    plot_bar_cmp_sim3()
+    plot_bar_cmp_sim2()
+    # plot_bar_cmp_sim3()

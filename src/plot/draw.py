@@ -331,7 +331,7 @@ def draw_bar_no_cmp2(x: list, y: list, xticks_label: list,
     # plt.bar(x, y, color=color_list[i], label=label_list[i], marker=marker_list[i])
     print(y)
     for a, b in zip(x, y):  # 柱子上的数字显示
-        plt.text(a, b, '%.1f' % (b*1E7), ha='center', va='bottom', font=font2,fontsize=12)
+        plt.text(a, b, '%.1f' % (b*1E7), ha='center', va='bottom', fontdict=font2,fontsize=12)
     plt.yticks(fontproperties='Times New Roman', size=18, ha="right")
     plt.xticks(ticks=np.linspace(x[0], x[-1], x_size), labels=xticks_label, fontproperties='Times New Roman',
                size=18)
