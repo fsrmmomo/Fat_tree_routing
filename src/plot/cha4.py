@@ -40,7 +40,7 @@ def plot_bar_cmp_sim1():
               figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
               save_name="4-sim-1-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
 def plot_bar_cmp_sim2():
-    data = pkl_read("../../result/cha4/ms")
+    data = pkl_read("../../result/cha4/ms2")
     for d in data:
         for i,num in enumerate(d):
             d[i] = 1-num
