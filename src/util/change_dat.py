@@ -3,6 +3,190 @@ import sys
 import pickle as pkl
 
 
+def time_dat_to_flag_dat_opt_opt():
+    """
+        将含时间戳的dat转换为不含时间戳但是包含大小流标记的dat数据，完美识别
+        "BBBBHBBBBHBId"  to "HBBBBHBBBBHBB"
+        :return:
+        """
+
+    # 0.5 一组进行切割，然后统计特征，进行识别
+    read_file_dir = "../../data/dat/time/20s/"
+    # write_file_dir = "../../data/dat/flag_dat/20s/"
+    write_file_dir = "../../data/dat/nodelay/20s3/"
+    big_key_dir = "../../data/dat/time/result1/"
+    trace_byte_size = 32
+
+    delay = 0.0
+    for i in range(1):
+        all_key = dict()
+        print(i)
+        T = 0.5
+        t = T
+        tmp_feature = dict()
+        now_win = 0
+        read_file = read_file_dir + str(i) + ".dat"
+
+        # big_keys = dict()
+        new_bin_list = []
+        tmp_all = dict()
+        tmp_big = dict()
+        aa_big_key = dict()
+        with open(read_file, 'rb') as rf:
+            bin_trace = rf.read(trace_byte_size)
+            while bin_trace:
+                hex_trace = struct.unpack("BBBBHBBBBHBId", bin_trace)
+                src_ip = int.from_bytes(bin_trace[0:4], 'big')
+                # hex_trace = struct.unpack("HBBBBHBBBBHB", bin_trace)
+                # src_ip = int.from_bytes(bin_trace[2:6], 'big')
+                if src_ip in all_key.keys():
+                    all_key[src_ip] += 1
+                else:
+                    all_key[src_ip] = 1
+                bin_trace = rf.read(trace_byte_size)
+
+            sort_list = []
+            for k, v in all_key.items():
+                sort_list.append([v, k])
+            sort_list.sort(reverse=True)
+            print(len(all_key))
+            bb = len(all_key) // 15
+            print(bb)
+            print(sort_list[:bb])
+            for tl in sort_list[:bb]:
+                aa_big_key[tl[1]] = 0
+            # return
+
+        with open(read_file, 'rb') as rf:
+            bin_trace = rf.read(trace_byte_size)
+
+            while bin_trace:
+                hex_trace = struct.unpack("BBBBHBBBBHBId", bin_trace)
+                src_ip = int.from_bytes(bin_trace[0:4], 'big')
+                # hex_trace = struct.unpack("HBBBBHBBBBHB", bin_trace)
+                # src_ip = int.from_bytes(bin_trace[2:6], 'big')
+                now_win += 1
+
+                all_key[src_ip] = 0
+                # all_key[src_ip] += 1
+
+                tmp_all[src_ip] = 0
+
+                if src_ip in aa_big_key:
+                    flag = 1
+                    tmp_big[src_ip] = 0
+                else:
+                    flag = 0
+
+                new_bin = struct.pack("HBBBBHBBBBHBB", hex_trace[-2], bin_trace[0], bin_trace[1], bin_trace[2],
+                                      bin_trace[3], hex_trace[4],
+                                      bin_trace[5], bin_trace[6], bin_trace[7], bin_trace[8], hex_trace[9],
+                                      hex_trace[-3], flag)
+                # new_bin = struct.pack("HBBBBHBBBBHBB", hex_trace[0],  hex_trace[1], hex_trace[2],
+                #                       hex_trace[3], hex_trace[4],
+                #                       hex_trace[5], hex_trace[6], hex_trace[7], hex_trace[8],
+                #                       hex_trace[9],hex_trace[10],hex_trace[11], flag)
+                new_bin_list.append(new_bin)
+
+
+                bin_trace = rf.read(trace_byte_size)
+
+        print(len(all_key))
+        write_file = write_file_dir + str(i) + ".dat"
+        with open(write_file, "wb") as wf:
+            for bin in new_bin_list:
+                wf.write(bin)
+
+
+def time_dat_to_flag_dat_opt():
+    """
+    将含时间戳的dat转换为不含时间戳但是包含大小流标记的dat数据,完美无时延
+    "BBBBHBBBBHBId"  to "HBBBBHBBBBHBB"
+    :return:
+    """
+
+    # 0.5 一组进行切割，然后统计特征，进行识别
+    read_file_dir = "../../data/dat/time/20s/"
+    # write_file_dir = "../../data/dat/flag_dat/20s/"
+    write_file_dir = "../../data/dat/nodelay/20s2/"
+    big_key_dir = "../../data/dat/time/result1/"
+    trace_byte_size = 32
+
+    delay = 0.0
+    for i in range(1):
+        all_key = dict()
+        print(i)
+        T = 0.5
+        t = T
+        tmp_feature = dict()
+        now_win = 0
+        read_file = read_file_dir + str(i) + ".dat"
+        big_key_file = big_key_dir + str(i) + ".pkl"
+
+        with open(big_key_file, "rb") as f:
+            all_big_keys = pkl.load(f)
+
+        big_key_index = 0
+        # big_keys = dict()
+        big_keys = all_big_keys[big_key_index]
+        print(len(big_keys))
+        new_bin_list = []
+        tmp_all = dict()
+        tmp_big = dict()
+        with open(read_file, 'rb') as rf:
+            bin_trace = rf.read(trace_byte_size)
+
+            while bin_trace:
+                hex_trace = struct.unpack("BBBBHBBBBHBId", bin_trace)
+                src_ip = int.from_bytes(bin_trace[0:4], 'big')
+                # insert(bin_trace, tmp_feature, now_win)
+                now_win += 1
+
+                all_key[src_ip] = 0
+
+                tmp_all[src_ip] = 0
+
+                if src_ip in big_keys:
+                    flag = 1
+                    tmp_big[src_ip] = 0
+                else:
+                    flag = 0
+                # new_bin = struct.pack("IHIHBIB", int.from_bytes(bin_trace[0:4], 'big'), hex_trace[4],
+                #                       int.from_bytes(bin_trace[6:10], 'big'), hex_trace[-4], hex_trace[-3],
+                #                       hex_trace[-2],
+                #                       flag)
+                new_bin = struct.pack("HBBBBHBBBBHBB", hex_trace[-2], bin_trace[0], bin_trace[1], bin_trace[2],
+                                      bin_trace[3], hex_trace[4],
+                                      bin_trace[5], bin_trace[6], bin_trace[7], bin_trace[8], hex_trace[9],
+                                      hex_trace[-3], flag)
+                new_bin_list.append(new_bin)
+                # print(len(new_bin))
+                if hex_trace[-1] > t + delay:
+                    t = t + T
+
+                    if big_key_index == 40 - 1:
+                        break
+                    big_keys.update(all_big_keys[big_key_index + 1])
+                    # print(len(big_keys))
+                    # print("tmp")
+                    # print(len(tmp_all))
+                    # print(len(tmp_big))
+                    # print()
+
+                    tmp_big.clear()
+                    tmp_all.clear()
+
+                    big_key_index += 1
+
+                bin_trace = rf.read(trace_byte_size)
+        print(len(big_keys))
+        print(len(all_key))
+        write_file = write_file_dir + str(i) + ".dat"
+        with open(write_file, "wb") as wf:
+            for bin in new_bin_list:
+                wf.write(bin)
+
+
 def time_dat_to_flag_dat():
     """
     将含时间戳的dat转换为不含时间戳但是包含大小流标记的dat数据
@@ -18,7 +202,7 @@ def time_dat_to_flag_dat():
     trace_byte_size = 32
 
     delay = 0.0
-    for i in range(10):
+    for i in range(1):
         all_key = dict()
         print(i)
         T = 0.5
@@ -235,4 +419,6 @@ def insert(bin_trace, tmp_feature, now_win):
 if __name__ == '__main__':
     # dat_to_feature()
     # read_pkl()
-    time_dat_to_flag_dat()
+    time_dat_to_flag_dat_opt_opt()
+    # time_dat_to_flag_dat_opt()
+    # time_dat_to_flag_dat()

@@ -1,4 +1,5 @@
 import struct
+from statistics import mean
 
 
 def read_ecmp_routing_and_get_mapping():
@@ -65,9 +66,12 @@ def gen_sub_dat():
     trace_byte_size = 15
     x = 0
     sw_bin_list = dict()
+
     subflow_to_switch_match_dict = read_ecmp_routing_and_get_mapping()
+    ll = []
     for i in range(10):
         print(i)
+        flow_num = dict()
         read_file = read_file_dir + str(i) + ".dat"
 
         for sw in node_list:
@@ -82,6 +86,7 @@ def gen_sub_dat():
                 hex_trace = struct.unpack("HBBBBHBBBBHB", bin_trace)
                 src_ip = int.from_bytes(bin_trace[2:6], 'big')
                 # print(src_ip)
+                flow_num[src_ip] = 1
 
                 index = src_ip % len(subflow_to_switch_match_dict)
                 for sw in subflow_to_switch_match_dict[index]:
@@ -92,14 +97,15 @@ def gen_sub_dat():
                 x += 1
                 # if x > 100:
                 #     break
-
+        print(len(flow_num))
+        ll.append(len(flow_num))
         # 存储bintrace
-        for sw in node_list:
-            write_file = write_file_dir +str(i)+"-" +sw+".dat"
-            with open(write_file,"wb") as wf:
-                for bin in sw_bin_list[sw]:
-                    wf.write(bin)
-
+        # for sw in node_list:
+        #     write_file = write_file_dir +str(i)+"-" +sw+".dat"
+        #     with open(write_file,"wb") as wf:
+        #         for bin in sw_bin_list[sw]:
+        #             wf.write(bin)
+    print(mean(ll))
 def gen_sub_dat_with_flag():
     """
     根据节点生成对应的dat文件
@@ -115,13 +121,13 @@ def gen_sub_dat_with_flag():
 
     # read_file_dir = "../../data/dat/flag_dat/20s/"
     # write_file_dir = "../../data/dat/flag_dat/slice/"
-    read_file_dir = "../../data/dat/nodelay/20s1/"
-    write_file_dir = "../../data/dat/nodelay/slice1/"
+    read_file_dir = "../../data/dat/nodelay/20s3/"
+    write_file_dir = "../../data/dat/nodelay/slice3/"
     trace_byte_size = 16
     x = 0
     sw_bin_list = dict()
     subflow_to_switch_match_dict = read_ecmp_routing_and_get_mapping()
-    for i in range(10):
+    for i in range(1):
         print(i)
         read_file = read_file_dir + str(i) + ".dat"
 

@@ -295,8 +295,8 @@ def get_kw_cmp():
 
 if __name__ == '__main__':
     # read_raw()
-    # aggregation_data()
+    aggregation_data()
     # count_num()
     # get_CDF()
     # error_cul()
-    get_kw_cmp()
+    # get_kw_cmp()

@@ -77,7 +77,7 @@ def cal2(w=1600, h=8, N=10000):
     y3 = x
 
     cc = (y1 - y2 + y3 - h) * w
-    print(cc / N)
+    # print(cc / N)
 
     z1 = 1
     z2 = 1
@@ -109,6 +109,8 @@ def cal3(w=1600, h=8, N=10000):
     print(P)
 
 def PP(i,w=1600, h=8, N=10000):
+    # print(NN)
+    # print(ww)
     x = NN / ww
     return math.pow(math.e, -x) * (math.pow(x, i) / math.factorial(i))
 
@@ -117,7 +119,7 @@ if __name__ == '__main__':
     # for i in range(10):
     #     print(hash(str(i)))
 
-    hash1 = Hash(ww, hh)
+    # hash1 = Hash(ww, hh)
     # hash1.test_collision(NN)
     # cal(ww, hh, NN)
     # cal2(ww, hh, NN)
@@ -151,18 +153,18 @@ if __name__ == '__main__':
     # for i in x:
     #     c1_r.append(cal(16000, 8, int(16000*8*i)))
     #     c2_r.append(cal2(16000, 8, int(16000*8*i)))
-
+    # global ww,hh,NN
     ww = int(1E6)
-    hh = 8
-    NN = int(ww*hh*0.1)
+    hh = 4
+    NN = int(ww*hh*0.2)
 
-    ww = int(1E5)
-    hh = 1
-    NN = int(ww*hh)
+    # ww = int(1E5)
+    # hh = 1
+    # NN = int(ww*hh)
     # ww = 1600
     # hh = 8
     # NN = 6643
-    print(cal(ww, hh, NN))
+    # print(cal(ww, hh, NN))
     print(cal2(ww, hh, NN))
     hash1 = Hash(ww, hh)
     hash1.test_collision(NN)

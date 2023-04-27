@@ -40,7 +40,7 @@ def plot_bar_cmp_sim1():
               figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
               save_name="4-sim-1-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
 def plot_bar_cmp_sim2():
-    data = pkl_read("../../result/cha4/ms2")
+    data = pkl_read("../../result/cha4/ms")
     for d in data:
         for i,num in enumerate(d):
             d[i] = 1-num
@@ -73,56 +73,58 @@ def plot_bar_cmp_sim2():
 
 def plot_bar_cmp_sim3():
     data = pkl_read("../../result/cha4/mm")
-    print(data[0][0])
-    print(data[0][1])
-    print(data[0][2])
-    print(data[0][3])
-    print(data[1][0])
-    print(data[1][1])
-    print(data[1][2])
-    print(data[1][3])
+    # print(data[0][0])
+    # print(data[0][1])
+    # print(data[0][2])
+    # print(data[0][3])
+    # print(data[1][0])
+    # print(data[1][1])
+    # print(data[1][2])
+    # print(data[1][3])
     # print(data[0])
     # print(data[2])
     # print(data[3])
     # sim3-1
-    # draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[0],
-    #           label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=[i+1 for i in range(10)], yticks_labels=None,
-    #           color_list=color_list, marker_list=marker_list,
-    #           xlimit=[0, 11], ylimit=[0,1.5],
-    #           xlabel="资源种类数量", ylabel="Ratio",
-    #           figsize=(8, 4.5), title="多任务多资源下测量节点分配算法效果",
-    #           save_name="4-sim-3-1", no=0, sci=False, log=False,ncols=2)
+    draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[0],
+              label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=[i+1 for i in range(10)], yticks_labels=None,
+              color_list=color_list, marker_list=marker_list,
+              xlimit=[0, 11], ylimit=[0,1.5],
+              xlabel="资源种类数量", ylabel="Ratio",
+              figsize=(8, 4.5), title="多任务多资源下测量节点分配算法效果",
+              save_name="4-sim-3-1", no=0, sci=False, log=False,ncols=2)
 
     # sim3-2-abcd
 
-    # draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[1],
-    #           label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
-    #           color_list=color_list, marker_list=marker_list,
-    #           xlimit=[0, 11], ylimit=[0,1.5],
-    #           xlabel="网络资源总量", ylabel="Ratio",
-    #           figsize=(8, 4.5), title="相同流量分布，相同资源分布下",
-    #           save_name="4-sim-3-2-a", no=0, sci=False, log=False,ncols=2,istitle=False)
-    # draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[2],
-    #           label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
-    #           color_list=color_list, marker_list=marker_list,
-    #           xlimit=[0, 11], ylimit=[0,1.5],
-    #           xlabel="网络资源总量", ylabel="Ratio",
-    #           figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
-    #           save_name="4-sim-3-2-b", no=0, sci=False, log=False,ncols=2,istitle=False)
-    # draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[3],
-    #           label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
-    #           color_list=color_list, marker_list=marker_list,
-    #           xlimit=[0, 11], ylimit=[0,1.5],
-    #           xlabel="网络资源总量", ylabel="Ratio",
-    #           figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
-    #           save_name="4-sim-3-2-c", no=0, sci=False, log=False,ncols=2,istitle=False)
-    # draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[4],
-    #           label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
-    #           color_list=color_list, marker_list=marker_list,
-    #           xlimit=[0, 11], ylimit=[0,1.5],
-    #           xlabel="网络资源总量", ylabel="Ratio",
-    #           figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
-    #           save_name="4-sim-3-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
+    draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[1],
+              label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
+              color_list=color_list, marker_list=marker_list,
+              xlimit=[0, 11], ylimit=[0,1.5],
+              xlabel="网络资源总量", ylabel="Ratio",
+              figsize=(8, 4.5), title="相同流量分布，相同资源分布下",
+              save_name="4-sim-3-2-a", no=0, sci=False, log=False,ncols=2,istitle=False)
+    draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[2],
+              label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
+              color_list=color_list, marker_list=marker_list,
+              xlimit=[0, 11], ylimit=[0,1.5],
+              xlabel="网络资源总量", ylabel="Ratio",
+              figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
+              save_name="4-sim-3-2-b", no=0, sci=False, log=False,ncols=2,istitle=False)
+    draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[3],
+              label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
+              color_list=color_list, marker_list=marker_list,
+              xlimit=[0, 11], ylimit=[0,1.5],
+              xlabel="网络资源总量", ylabel="Ratio",
+              figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
+              save_name="4-sim-3-2-c", no=0, sci=False, log=False,ncols=2,istitle=False)
+    draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[4],
+              label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=["%.1f"%((i+1)*0.2) for i in range(10)], yticks_labels=None,
+              color_list=color_list, marker_list=marker_list,
+              xlimit=[0, 11], ylimit=[0,1.5],
+              xlabel="网络资源总量", ylabel="Ratio",
+              figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
+              save_name="4-sim-3-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
+
 if __name__ == '__main__':
+    plot_bar_cmp_sim1()
     plot_bar_cmp_sim2()
-    # plot_bar_cmp_sim3()
+    plot_bar_cmp_sim3()

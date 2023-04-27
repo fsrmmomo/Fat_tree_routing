@@ -16,12 +16,18 @@ algo_set = {algo1}
 data_dict = dict()
 error_dict = dict()
 cmp_dict = dict()
-cmp_dict["ARE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
+# cmp_dict["ARE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
+# # cmp_dict["ARE"] = [algo1]
+# cmp_dict["CE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
+# cmp_dict["HHD_ARE"] = [algo1,algo2,"Elastic Sketch"]
+# cmp_dict["HHD_F1"] = [algo1,algo2,"Elastic Sketch"]
+# cmp_dict["WMRE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
+cmp_dict["ARE"] = [algo1,"Elastic Sketch","CountMin Sketch"]
 # cmp_dict["ARE"] = [algo1]
-cmp_dict["CE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
-cmp_dict["HHD_ARE"] = [algo1,algo2,"Elastic Sketch"]
-cmp_dict["HHD_F1"] = [algo1,algo2,"Elastic Sketch"]
-cmp_dict["WMRE"] = [algo1,algo2,"Elastic Sketch","CountMin Sketch"]
+cmp_dict["CE"] = [algo1,"Elastic Sketch","CountMin Sketch"]
+cmp_dict["HHD_ARE"] = [algo1,"Elastic Sketch"]
+cmp_dict["HHD_F1"] = [algo1,"Elastic Sketch"]
+cmp_dict["WMRE"] = [algo1,"Elastic Sketch","CountMin Sketch"]
 xticks_label = ["%.1f" % i for i in mem_list][:data_point_num]
 
 # 加载result

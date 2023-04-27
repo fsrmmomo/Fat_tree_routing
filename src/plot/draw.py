@@ -16,6 +16,10 @@ font2 = {'family': 'Times New Roman',
          'weight': 'normal',
          'size': 20,
          }
+fonte = {'family': 'Times New Roman',
+         'weight': 'normal',
+         'size': 20,
+         }
 font1 = {'family': 'SimSun',
          'weight': 'normal',
          'size': 20,
@@ -48,7 +52,7 @@ def draw_line(x: list, y_list: list, label_list: list, color_list: list,
               marker_list: list, xlimit, ylimit, xlabel: str, ylabel: str,
               figsize: tuple, title: str,
               save_name: str, no: int,
-              sci=False, log=False,ncols=1):
+              sci=False, log=False,ncols=1,istitle=False):
     assert len(x) == len(xticks_label)
     assert len(y_list) == len(label_list)
     assert len(y_list) <= len(marker_list)
@@ -69,8 +73,8 @@ def draw_line(x: list, y_list: list, label_list: list, color_list: list,
     # 修改刻度线向内 需在plot之前
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
-
-    plt.title(title, fontdict=font1)
+    if istitle:
+        plt.title(title, fontdict=fonte)
 
     # 使用对数曲线
     if log:
@@ -93,8 +97,9 @@ def draw_line(x: list, y_list: list, label_list: list, color_list: list,
         ax.get_yaxis().get_offset_text().set(va='bottom', ha='left', fontsize="large",
                                              fontproperties="stixgeneral", fontstyle="normal")
 
-    plt.xlabel(xlabel, fontdict=font1)
-    plt.ylabel(ylabel, fontdict=font1)
+    # plt.xlabel(xlabel, fontdict=fonte)
+    plt.xlabel(xlabel, fontdict=fonte)
+    plt.ylabel(ylabel, fontdict=fonte)
     plt.legend(prop=font3,ncols=ncols)
     plt.grid()
     if xlimit is not None:
@@ -106,15 +111,17 @@ def draw_line(x: list, y_list: list, label_list: list, color_list: list,
     f = plt.gcf()
     plt.show()
     if save_name is not None:
-        f.savefig("../../result/figure/" + save_name + ".jpg", dpi=300)
-        f.savefig("../../result/figure/" + save_name + ".svg", dpi=300, format="svg")
+        print(save_name)
+        # f.savefig("../../result/figure/cha3/" + save_name + ".jpg", dpi=300)
+        # f.savefig("../../result/figure/cha3/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha3/" + save_name + ".pdf", dpi=300)
 
 
 def draw_line_no_cmp(x: list, y: list, xticks_label: list,
                      xlimit, ylimit, xlabel: str, ylabel: str,
                      figsize: tuple, title: str,
                      save_name: str, no: int,
-                     sci=False, log=False):
+                     sci=False, log=False, istitle=False):
     assert len(x) == len(y)
     x_size = len(x)
 
@@ -125,7 +132,8 @@ def draw_line_no_cmp(x: list, y: list, xticks_label: list,
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
 
-    plt.title(title, fontdict=font1)
+    if istitle:
+        plt.title(title, fontdict=font1)
 
     # 使用对数曲线
     if log:
@@ -160,8 +168,9 @@ def draw_line_no_cmp(x: list, y: list, xticks_label: list,
     f = plt.gcf()
     plt.show()
     if save_name is not None:
-        f.savefig("../../result/figure/" + save_name + ".jpg", dpi=300)
-        f.savefig("../../result/figure/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha3/" + save_name + ".jpg", dpi=300)
+        f.savefig("../../result/figure/cha3/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha3/" + save_name + ".pdf", dpi=300)
 
 
 def plot_linear(task, ylimit: list, title_patter: str, sci=False, log=False):
@@ -169,9 +178,16 @@ def plot_linear(task, ylimit: list, title_patter: str, sci=False, log=False):
     cmp_list = cmp_dict[task]
     label_list = cmp_list
     new_label_list = cmp_list[:]
-    if "CountMin Sketch" in new_label_list:
-        new_label_list.remove("CountMin Sketch")
-        new_label_list.append("CM Sketch")
+    # if "CountMin Sketch" in new_label_list:
+    #     new_label_list.remove("CountMin Sketch")
+    #     new_label_list.append("CM Sketch")
+
+    for i,namei in enumerate(new_label_list):
+        if namei == "TM-SALFI":
+            new_label_list[i] = "TM-EALFI"
+        if namei == "CountMin Sketch":
+            new_label_list[i] = "CM Sketch"
+
 
     print(task)
     # table = excel_.create_sheet(task)
@@ -188,8 +204,11 @@ def plot_linear(task, ylimit: list, title_patter: str, sci=False, log=False):
             y_list.append(data_dict[algo][task][node][:data_point_num])
         # title = "Heavy Hitter Detection on " + node.capitalize() + " Node"
         node_name = node_name_map[node]
-        title = title_patter + " on " + node_name.capitalize() + " Switches"
-        save_name = task + "_" + node_name
+        if node_name.capitalize() == "Edge":
+            title = title_patter + " on " + "Access" + " Nodes"
+        else:
+            title = title_patter + " on " + node_name.capitalize() + " Nodes"
+        save_name ="3-sim-"+ task + "_" + node_name
         if task == "HHD_ARE":
             ylabel = "ARE"
         elif task == "HHD_F1":
@@ -221,7 +240,7 @@ def plot_linear(task, ylimit: list, title_patter: str, sci=False, log=False):
                   label_list=new_label_list, xticks_label=xticks_label, yticks_labels=None,
                   color_list=color_list, marker_list=marker_list,
                   xlimit=[0, data_point_num - 1], ylimit=ylimit,
-                  xlabel="Memory Usage (MB)", ylabel=ylabel,
+                  xlabel="总内存 (MB)", ylabel=ylabel,
                   figsize=(8, 4.5), title=title,
                   save_name=save_name, no=i, sci=sci, log=log)
 
@@ -299,6 +318,7 @@ def draw_bar_cmp(x: list, y_list: list, label_list: list, color_list: list,
     if save_name is not None:
         f.savefig("../../result/figure/cha4/" + save_name + ".jpg", dpi=300)
         f.savefig("../../result/figure/cha4/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha4/" + save_name + ".pdf", dpi=300)
 
 def draw_bar_no_cmp2(x: list, y: list, xticks_label: list,
                     xlimit, ylimit, xlabel: str, ylabel: str,
@@ -327,11 +347,11 @@ def draw_bar_no_cmp2(x: list, y: list, xticks_label: list,
     # 使用对数曲线
     if log:
         plt.yscale('log')
-    plt.bar(x, y, width=0.4, zorder=10)
+    plt.bar(x, y, width=0.4, zorder=10,)
     # plt.bar(x, y, color=color_list[i], label=label_list[i], marker=marker_list[i])
     print(y)
     for a, b in zip(x, y):  # 柱子上的数字显示
-        plt.text(a, b, '%.1f' % (b*1E7), ha='center', va='bottom', fontdict=font2,fontsize=12)
+        plt.text(a, b, '%.1f' % (b*1E7), ha='center', va='bottom', fontdict=font2)
     plt.yticks(fontproperties='Times New Roman', size=18, ha="right")
     plt.xticks(ticks=np.linspace(x[0], x[-1], x_size), labels=xticks_label, fontproperties='Times New Roman',
                size=18)
@@ -361,12 +381,12 @@ def draw_bar_no_cmp2(x: list, y: list, xticks_label: list,
     if save_name is not None:
         f.savefig("../../result/figure/cha4/" + save_name + ".jpg", dpi=300)
         f.savefig("../../result/figure/cha4/" + save_name + ".svg", dpi=300, format="svg")
-
-def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
+        f.savefig("../../result/figure/cha4/" + save_name + ".pdf", dpi=300)
+def draw_bar_no_cmp3(x: list, y: list, xticks_label: list,
                     xlimit, ylimit, xlabel: str, ylabel: str,
                     figsize: tuple, title: str,
                     save_name: str, no: int,
-                    sci=False, log=False):
+                    sci=False, log=False,istitle=True):
     assert len(x) == len(xticks_label)
     x_size = len(x)
 
@@ -376,24 +396,27 @@ def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
     # 修改刻度线向内 需在plot之前
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
-    plt.title(title, fontdict=font1)
+    if istitle:
+        plt.title(title, fontdict=font1)
 
     # zorder=0 设置图层级别 不遮挡数据
     plt.grid(zorder=0)
 
-    color_list = []
-    color_list.extend(['g' for _ in range(8)])
-    color_list.extend(['b' for _ in range(8)])
-    color_list.extend(['c' for _ in range(4)])
+    # color_list = []
+    # color_list.extend(['g' for _ in range(8)])
+    # color_list.extend(['b' for _ in range(8)])
+    # color_list.extend(['c' for _ in range(4)])
     # 使用对数曲线
     if log:
         plt.yscale('log')
-    plt.bar(x, y, width=0.4, zorder=10, color=color_list)
+    plt.bar(x, y, width=0.4, zorder=10,color='teal')
     # plt.bar(x, y, color=color_list[i], label=label_list[i], marker=marker_list[i])
-
+    print(y)
+    for a, b in zip(x, y):  # 柱子上的数字显示
+        plt.text(a, b, '%.3f' % (b), ha='center', va='bottom', fontdict=fonte)
     plt.yticks(fontproperties='Times New Roman', size=18, ha="right")
     plt.xticks(ticks=np.linspace(x[0], x[-1], x_size), labels=xticks_label, fontproperties='Times New Roman',
-               size=18, rotation=45)
+               size=18)
     ax = plt.gca()
 
     # 设置文字和刻度的间距,防止左下角x和y重叠
@@ -406,7 +429,7 @@ def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
                                              fontproperties="stixgeneral", fontstyle="normal")
 
     plt.xlabel(xlabel, fontdict=font1)
-    plt.ylabel(ylabel, fontdict=font1)
+    plt.ylabel(ylabel, fontdict=fonte)
 
     # plt.legend(prop=font1)
     if xlimit is not None:
@@ -418,8 +441,74 @@ def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
     f = plt.gcf()
     plt.show()
     if save_name is not None:
-        f.savefig("../../result/figure/" + save_name + ".jpg", dpi=300)
-        f.savefig("../../result/figure/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha4/" + save_name + ".jpg", dpi=300)
+        f.savefig("../../result/figure/cha4/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha4/" + save_name + ".pdf", dpi=300)
+def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
+                    xlimit, ylimit, xlabel: str, ylabel: str,
+                    figsize: tuple, title: str,
+                    save_name: str, no: int,
+                    sci=False, log=False,istitle=False):
+    assert len(x) == len(xticks_label)
+    x_size = len(x)
+
+    plt.figure(num=no, figsize=figsize, dpi=300)
+    plt.rcParams['font.sans-serif'] = ['SimSun', 'Times New Roman']
+    # plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号(无用)
+    # 修改刻度线向内 需在plot之前
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    if istitle:
+        plt.title(title, fontdict=fonte)
+
+    # zorder=0 设置图层级别 不遮挡数据
+    plt.grid(zorder=0)
+
+    color_list = []
+    color_list.extend(['g' for _ in range(8)])
+    color_list.extend(['b' for _ in range(8)])
+    color_list.extend(['c' for _ in range(4)])
+    # 使用对数曲线
+    if log:
+        plt.yscale('log')
+    plt.bar(x, y, width=0.4, zorder=10, color='w',hatch="xxx",edgecolor="g")
+    # plt.bar(x, y, width=0.4, zorder=10, color="color_list",hatch="...")
+    # plt.bar(x, y, color=color_list[i], label=label_list[i], marker=marker_list[i])
+    for a, b in zip(x, y):  # 柱子上的数字显示
+        plt.text(a, b, '%.2f' % b, ha='center', va='bottom',fontproperties='Times New Roman', fontsize=18)
+    # plt.yticks(fontproperties='Times New Roman', size=18, ha="right")
+    # plt.xticks(ticks=np.linspace(x[0], x[-1], x_size), labels=xticks_label, fontproperties='Times New Roman',
+    #            size=18, rotation=45)
+    plt.yticks(fontproperties='Times New Roman', size=18, ha="right")
+    plt.xticks(ticks=np.linspace(x[0], x[-1], x_size), labels=xticks_label, fontproperties='Times New Roman',
+               size=18, rotation=0)
+    ax = plt.gca()
+
+    # 设置文字和刻度的间距,防止左下角x和y重叠
+    # ax.tick_params(axis="x", pad=10)
+    # 设置纵坐标科学计数法
+    if sci:
+        ax.ticklabel_format(style='sci', scilimits=(0, 0), axis='y', useMathText=True)
+        print(mpl.rcParams['xtick.labelsize'])
+        ax.get_yaxis().get_offset_text().set(va='bottom', ha='left', fontsize="large",
+                                             fontproperties="stixgeneral", fontstyle="normal")
+
+    plt.xlabel(xlabel, fontdict=fonte)
+    plt.ylabel(ylabel, fontdict=fonte)
+
+    # plt.legend(prop=font1)
+    if xlimit is not None:
+        plt.xlim(xlimit[0], xlimit[1])
+    if ylimit is not None:
+        plt.ylim(ylimit[0], ylimit[1])
+    plt.tight_layout()
+
+    f = plt.gcf()
+    plt.show()
+    if save_name is not None:
+        f.savefig("../../result/figure/cha3/" + save_name + ".jpg", dpi=300)
+        f.savefig("../../result/figure/cha3/" + save_name + ".svg", dpi=300, format="svg")
+        f.savefig("../../result/figure/cha3/" + save_name + ".pdf", dpi=300)
 
 
 # plot_bar():
@@ -573,11 +662,11 @@ def plot_statistics():
     #             print(ddd)
     #             print(vvv)
 
-    # plot_linear("ARE", ylimit=[0, 2], title_patter="Flow Size Measurement")
+    plot_linear("ARE", ylimit=[0, 2], title_patter="Flow Size Measurement")
     # plot_linear("HHD_ARE", ylimit=[0, 0.03], title_patter="Heavy Hitter Detection")
-    # plot_linear("HHD_F1", ylimit=[0.90, 1], title_patter="Heavy Hitter Detection")
+    plot_linear("HHD_F1", ylimit=[0.95, 1.05], title_patter="Heavy Hitter Detection")
     plot_linear("CE", ylimit=[0, 0.03], title_patter="Cardinality Estimation", log=False)
-    # plot_linear("WMRE", ylimit=[0.0005, 2], title_patter="Flow Size Distribution Estimation", log=True)
+    plot_linear("WMRE", ylimit=[0.0005, 2], title_patter="Flow Size Distribution Estimation", log=True)
     # plot_linear("CE", ylimit=[0.00001,0.1], title_patter="Cardinality Estimation",log=True)
     # excel_.save("../../result/data_dict/data1.xlsx")
     # excel_.save("../../result/data_dict/data1.xlsx")
@@ -600,11 +689,14 @@ def plot_flow_and_pkt_count():
     xticks_label = []
     for node in node_list:
         if node[:-1] == "access":
-            xticks_label.append("Edge" + node[-1])
+            # xticks_label.append("Edge" + node[-1])
+            xticks_label.append("接入" + node[-1])
         elif node[:-1] == "merge":
-            xticks_label.append("Agg" + node[-1])
+            # xticks_label.append("Agg" + node[-1])
+            xticks_label.append("汇聚" + node[-1])
         else:
-            xticks_label.append(node)
+            # xticks_label.append(node)
+            xticks_label.append("核心" + node[-1])
 
     print(xticks_label)
     print(len(xticks_label))
@@ -612,15 +704,15 @@ def plot_flow_and_pkt_count():
     print(pkt_count_dict)
     draw_bar_no_cmp(x=list(range(20)), y=flow_count_list,
                     xlimit=[-1, 20], ylimit=[0, 90000], xticks_label=xticks_label,
-                    xlabel="Node", ylabel="Number of Flows",
+                    xlabel="测量节点", ylabel="节点测量的流数目",
                     figsize=(9, 4.5), title="Number of Flows on Each Node",
-                    save_name="Flows_Number", no=1, sci=True, log=False)
+                    save_name="3-sim-Flows_Number", no=1, sci=True, log=False)
 
     draw_bar_no_cmp(x=list(range(20)), y=pkt_count_list,
                     xlimit=[-1, 20], ylimit=[0, 500000], xticks_label=xticks_label,
-                    xlabel="Node", ylabel="Number of Packets",
+                    xlabel="测量节点", ylabel="节点测量的包数目",
                     figsize=(9, 4.5), title="Number of Packets on Each Node",
-                    save_name="Packets_Number", no=1, sci=True, log=False)
+                    save_name="3-sim-Packets_Number", no=1, sci=True, log=False)
 
 
 
@@ -634,9 +726,9 @@ def plot_CDF():
     draw_line_no_cmp(x=list(range(0, 101, 5)), y=[int(cdf_list[i] * 100) for i in range(0, 101, 5)],
                      xticks_label=[i for i in range(0, 101, 5)],
                      xlimit=[0, 100], ylimit=[0, 100],
-                     xlabel="Percentage of Top Flow(%)", ylabel="Percentage of Packets(%)",
+                     xlabel="流百分比(%)", ylabel="数据包百分比(%)",
                      figsize=(8, 4.5), title="Cumulative Distribution Function of Flow Size",
-                     save_name="CDF", no=1, sci=False, log=False)
+                     save_name="3-sim-CDF", no=1, sci=False, log=False)
 
 
 def get_all_data():
@@ -656,14 +748,16 @@ def get_all_data():
     print(data_dict.keys())
     data_dict["TM-SALFM"] = data_dict["ServerCount Sketch"]
     data_dict.pop("ServerCount Sketch")
-    global error_dict
-    error_dict = pkl_read("../../result/data_dict/error_1.pkl")
-    error_dict.update(pkl_read("../../result/data_dict/confidence_interval.pkl"))
-    error_dict["TM-SALFM"] = error_dict["ServerCount Sketch"]
-    error_dict.pop("ServerCount Sketch")
-    print(error_dict.keys())
+    # global error_dict
+    # error_dict = pkl_read("../../result/data_dict/error_1.pkl")
+    # error_dict.update(pkl_read("../../result/data_dict/confidence_interval.pkl"))
+    # error_dict["TM-SALFM"] = error_dict["ServerCount Sketch"]
+    # error_dict.pop("ServerCount Sketch")
+    # print(error_dict.keys())
+    # pkl_write("../../result/data_dict/all_error.pkl", error_dict)
+    print(data_dict['TM-SALFI']['WMRE'])
+    print(data_dict['Elastic Sketch']['WMRE'])
     pkl_write("../../result/data_dict/all_data.pkl", data_dict)
-    pkl_write("../../result/data_dict/all_error.pkl", error_dict)
 
 
 def plot_kw_cmp():
@@ -704,8 +798,10 @@ def plot_diff_t():
               figsize=(8, 4.5), title="Flow Size Measurement on Edge Switches",
               save_name="t_cmp", no=0, sci=False, log=False,ncols=2)
 
+
+
 if __name__ == '__main__':
-    # get_all_data()
+    get_all_data()
 
     # global data_dict
     # for algo in algo_set:
@@ -717,16 +813,20 @@ if __name__ == '__main__':
     #     print(v)
     # print(data_dict[algo])
     # print(data_dict)
-    # plot_linear("ARE", ylimit=[0, 2], title_patter="Flow Size Measurement")
-    # plot_linear("HHD_ARE", ylimit=[0, 0.03], title_patter="Heavy Hitter Detection")
-    # plot_linear("HHD_F1", ylimit=[0.9, 1], title_patter="Heavy Hitter Detection")
-    # plot_linear("CE", ylimit=[0.00001,0.1], title_patter="Cardinality Estimation",log=True)
-    # plot_linear("CE", ylimit=[0,0.1], title_patter="Cardinality Estimation",log=False)
-    # plot_linear("WMRE", ylimit=[0.0001,2], title_patter="Flow Size Distribution Estimation",log=True)
 
-    # plot_flow_and_pkt_count()
-    # plot_statistics()
+
+    plot_flow_and_pkt_count()
+    # plot_CDF()
+    # polt_part_node()
+    plot_statistics()
     # plot_statistics_error_bar()
     # plot_kw_cmp()
     # plot_diff_t()
-    plot_bar_cmp()
+    # plot_bar_cmp()
+
+
+
+
+
+
+
