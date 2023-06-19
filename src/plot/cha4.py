@@ -73,18 +73,7 @@ def plot_bar_cmp_sim2():
 
 def plot_bar_cmp_sim3():
     data = pkl_read("../../result/cha4/mm")
-    # print(data[0][0])
-    # print(data[0][1])
-    # print(data[0][2])
-    # print(data[0][3])
-    # print(data[1][0])
-    # print(data[1][1])
-    # print(data[1][2])
-    # print(data[1][3])
-    # print(data[0])
-    # print(data[2])
-    # print(data[3])
-    # sim3-1
+
     draw_bar_cmp(x=[i+1 for i in range(10)], y_list=data[0],
               label_list=["MTMR-TR", "MTMR-RR","MTMR-Mix", 'OPT'], xticks_label=[i+1 for i in range(10)], yticks_labels=None,
               color_list=color_list, marker_list=marker_list,
@@ -124,7 +113,13 @@ def plot_bar_cmp_sim3():
               figsize=(8, 4.5), title="单任务下测量节点分配算法效果",
               save_name="4-sim-3-2-d", no=0, sci=False, log=False,ncols=2,istitle=False)
 
+def read_all_data():
+    data = pkl_read("../../result/cha4/ms")
+    print(data)
+    data = pkl_read("../../result/cha4/mm")
+    print(data)
 if __name__ == '__main__':
-    plot_bar_cmp_sim1()
-    plot_bar_cmp_sim2()
-    plot_bar_cmp_sim3()
+    # plot_bar_cmp_sim1()
+    # plot_bar_cmp_sim2()
+    # plot_bar_cmp_sim3()
+    read_all_data()

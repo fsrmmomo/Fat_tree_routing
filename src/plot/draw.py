@@ -27,7 +27,7 @@ font1 = {'family': 'SimSun',
 font3 = {'family': 'Times New Roman',
          'weight': 'bold',
          # 'style':'italic',
-         'size': 20,
+         'size': 14,
          }
 figure_no = 1
 
@@ -506,8 +506,8 @@ def draw_bar_no_cmp(x: list, y: list, xticks_label: list,
     f = plt.gcf()
     plt.show()
     if save_name is not None:
-        f.savefig("../../result/figure/cha3/" + save_name + ".jpg", dpi=300)
-        f.savefig("../../result/figure/cha3/" + save_name + ".svg", dpi=300, format="svg")
+        # f.savefig("../../result/figure/cha3/" + save_name + ".jpg", dpi=300)
+        # f.savefig("../../result/figure/cha3/" + save_name + ".svg", dpi=300, format="svg")
         f.savefig("../../result/figure/cha3/" + save_name + ".pdf", dpi=300)
 
 
@@ -737,9 +737,9 @@ def get_all_data():
     data_dict.update(pkl_read("../../result/data_dict/output_10.pkl"))
     # data_dict.update(pkl_read("../../result/data_dict/edge.pkl"))
 
-    print(pkl_read("../../result/data_dict/output_10.pkl"))
+    # print(pkl_read("../../result/data_dict/output_10.pkl"))
     edge_dict = pkl_read("../../result/data_dict/edge.pkl")
-    print(edge_dict)
+    # print(edge_dict)
     for al,d in edge_dict.items():
         for task,dd in d.items():
             data_dict[al][task]["access"] = edge_dict[al][task]["access"]
@@ -757,6 +757,9 @@ def get_all_data():
     # pkl_write("../../result/data_dict/all_error.pkl", error_dict)
     print(data_dict['TM-SALFI']['WMRE'])
     print(data_dict['Elastic Sketch']['WMRE'])
+
+    print(data_dict)
+
     pkl_write("../../result/data_dict/all_data.pkl", data_dict)
 
 
@@ -815,10 +818,10 @@ if __name__ == '__main__':
     # print(data_dict)
 
 
-    plot_flow_and_pkt_count()
+    # plot_flow_and_pkt_count()
     # plot_CDF()
     # polt_part_node()
-    plot_statistics()
+    # plot_statistics()
     # plot_statistics_error_bar()
     # plot_kw_cmp()
     # plot_diff_t()
